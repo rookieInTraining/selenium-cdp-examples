@@ -13,7 +13,7 @@ repositories {
 
 ext.libraries = [
         //For Browsers and Devices
-        selenium                : 'org.seleniumhq.selenium:selenium-java:4.0.0-beta-4',
+        selenium                : 'org.seleniumhq.selenium:selenium-java:4.1.2',
         webdrivermanager        : 'io.github.bonigarcia:webdrivermanager:4.3.1'
 ]
 

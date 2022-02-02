@@ -6,11 +6,13 @@ import com.rookieintraining.cdp.BaseTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.devtools.v90.network.Network;
-import org.openqa.selenium.devtools.v90.network.model.ConnectionType;
-import org.openqa.selenium.devtools.v90.network.model.Cookie;
-import org.openqa.selenium.devtools.v90.network.model.Headers;
+import org.openqa.selenium.By;
+import org.openqa.selenium.devtools.v97.network.Network;
+import org.openqa.selenium.devtools.v97.network.model.ConnectionType;
+import org.openqa.selenium.devtools.v97.network.model.Cookie;
+import org.openqa.selenium.devtools.v97.network.model.Headers;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,6 +68,35 @@ public class Networks extends BaseTest {
                 1000, Optional.of(ConnectionType.CELLULAR2G)));
         driver.get("https://duckduckgo.com");
         Thread.sleep(5000);
+    }
+
+    @Test
+    public void capture_websockets_via_network_commands() throws InterruptedException {
+        devTools.addListener(Network.webSocketCreated(), (webSocketCreated) ->  {
+            System.out.println("Established Connection with : " + webSocketCreated.getUrl());
+        });
+
+        devTools.addListener(Network.webSocketFrameReceived(), (socketFrameReceived) ->  {
+            byte[] stringBytes = Base64.getDecoder().decode(socketFrameReceived.getResponse().getPayloadData());
+            System.out.println("===========> Received :\n" + new String(stringBytes));
+        });
+
+        devTools.addListener(Network.webSocketFrameSent(), (socketFrameSent) ->  {
+            byte[] stringBytes = Base64.getDecoder().decode(socketFrameSent.getResponse().getPayloadData());
+            System.out.println("<=========== Sent :\n" + new String(stringBytes));
+        });
+
+        driver.get("http://www.hivemq.com/demos/websocket-client/");
+        Thread.sleep(3000);
+
+        driver.findElement(By.cssSelector("#connectButton")).click();
+        Thread.sleep(3000);
+
+        driver.findElement(By.cssSelector("#publishPayload")).sendKeys("Lorem Ipsum! Dolor Si amor!");
+        Thread.sleep(1000);
+        driver.findElement(By.cssSelector("#publishButton")).click();
+
+        Thread.sleep(1000);
     }
 
     @AfterEach

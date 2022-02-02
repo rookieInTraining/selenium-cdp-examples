@@ -2,9 +2,9 @@ package com.rookieintraining.cdp.examples;
 
 import com.rookieintraining.cdp.BaseTest;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.devtools.v91.dom.model.Rect;
-import org.openqa.selenium.devtools.v91.emulation.Emulation;
-import org.openqa.selenium.devtools.v91.page.Page;
+import org.openqa.selenium.devtools.v97.dom.model.Rect;
+import org.openqa.selenium.devtools.v97.emulation.Emulation;
+import org.openqa.selenium.devtools.v97.page.Page;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.openqa.selenium.devtools.Command;
 import org.openqa.selenium.devtools.ConverterFunctions;
-import org.openqa.selenium.devtools.v90.browser.model.Bounds;
+import org.openqa.selenium.devtools.v97.browser.model.Bounds;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class Browser extends BaseTest {
@@ -20,9 +20,9 @@ public class Browser extends BaseTest {
     @Test
     public void get_browser_version() {
         driver.get("https://duckduckgo.com");
-        org.openqa.selenium.devtools.v90.browser.Browser.GetVersionResponse response =
+        org.openqa.selenium.devtools.v97.browser.Browser.GetVersionResponse response =
                 devTools.send(new Command<>("Browser.getVersion",
-                        ImmutableMap.of(), input -> input.read(org.openqa.selenium.devtools.v90.browser.Browser.GetVersionResponse.class)));
+                        ImmutableMap.of(), input -> input.read(org.openqa.selenium.devtools.v97.browser.Browser.GetVersionResponse.class)));
 
         System.out.println("Browser Version : " + response.getProduct());
         System.out.println("Browser User Agent : " + response.getUserAgent());
