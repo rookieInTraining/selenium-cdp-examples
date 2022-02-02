@@ -61,8 +61,8 @@ public class Pages extends BaseTest {
         devTools.send(Page.startScreencast(Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.of(1)));
 
-        driver.get("https://duckduckgo.com");
-        Thread.sleep(1500);
+        driver.get("https://www.youtube.com");
+        Thread.sleep(5000);
         devTools.send(Page.stopScreencast());
     }
 

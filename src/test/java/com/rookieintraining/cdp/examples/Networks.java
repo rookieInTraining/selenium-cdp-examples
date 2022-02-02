@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.devtools.v97.network.Network;
 import org.openqa.selenium.devtools.v97.network.model.ConnectionType;
 import org.openqa.selenium.devtools.v97.network.model.Cookie;
@@ -45,7 +46,7 @@ public class Networks extends BaseTest {
         devTools.send(Network.setExtraHTTPHeaders(new Headers(ImmutableMap.of("customHeaderName", "customHeaderValue"))));
         devTools.addListener(Network.requestWillBeSent(), requestWillBeSent -> {
             System.out.println(
-                requestWillBeSent.getRequest().getHeaders().get("customHeaderName")
+                requestWillBeSent.getRequest().getHeaders().toJson().get("customHeaderName")
                         .toString().equalsIgnoreCase("customHeaderValue")
             );
         });
@@ -56,10 +57,13 @@ public class Networks extends BaseTest {
 
     @Test
     public void disable_network_via_network_commands() throws InterruptedException {
-        driver.get("https://duckduckgo.com");
-        Thread.sleep(5000);
         devTools.send(Network.emulateNetworkConditions(true, 0, 0, 0, Optional.of(ConnectionType.NONE)));
         Thread.sleep(5000);
+        try {
+            driver.get("https://duckduckgo.com");
+        } catch (WebDriverException wde) {
+            System.out.println("Encountered an error!!");
+        }
     }
 
     @Test

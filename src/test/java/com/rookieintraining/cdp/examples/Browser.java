@@ -2,15 +2,89 @@ package com.rookieintraining.cdp.examples;
 
 import com.rookieintraining.cdp.BaseTest;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.devtools.v97.browser.model.Bounds;
 import org.openqa.selenium.devtools.v97.browser.model.WindowID;
 
+import java.util.Optional;
+
 public class Browser extends BaseTest {
+
+    boolean isCompleted = false;
 
     @Test
     public void crash_browser() {
-        driver.get("https://duckduckgo.com");
-        devTools.send(org.openqa.selenium.devtools.v97.browser.Browser.crash());
+        try {
+            driver.get("https://duckduckgo.com");
+            devTools.send(org.openqa.selenium.devtools.v97.browser.Browser.crash());
+        } catch (WebDriverException wde) {
+            System.out.println("Browser successfully crashed!!");
+        }
+    }
+
+    @Test
+    public void download_a_file() throws InterruptedException {
+        devTools.send(org.openqa.selenium.devtools.v97.browser.Browser.setDownloadBehavior(
+                org.openqa.selenium.devtools.v97.browser.Browser.SetDownloadBehaviorBehavior.ALLOW,
+                Optional.empty(),
+                Optional.of(System.getProperty("user.dir")),
+                Optional.of(true)
+        ));
+        devTools.addListener(org.openqa.selenium.devtools.v97.browser.Browser.downloadWillBegin(), downloadWillBegin -> {
+            System.out.println("Download Started!!");
+        });
+
+        devTools.addListener(org.openqa.selenium.devtools.v97.browser.Browser.downloadProgress(), downloadProgress -> {
+            System.out.println(downloadProgress.getState() + " : " + downloadProgress.getReceivedBytes()
+                    + " : " + downloadProgress.getTotalBytes());
+            if (downloadProgress.getState().toString().equalsIgnoreCase("completed")) {
+                isCompleted = true;
+            }
+        });
+
+        driver.get("https://the-internet.herokuapp.com/download");
+        Thread.sleep(5000);
+        driver.findElement((By.cssSelector("[href=\"download/5mb script.xml\"]"))).click();
+
+        do {
+            Thread.sleep(100);
+        } while (!isCompleted);
+
+        isCompleted = false;
+    }
+
+    @Test
+    public void cancel_download_of_file() throws InterruptedException {
+        devTools.send(org.openqa.selenium.devtools.v97.browser.Browser.setDownloadBehavior(
+                org.openqa.selenium.devtools.v97.browser.Browser.SetDownloadBehaviorBehavior.ALLOW,
+                Optional.empty(),
+                Optional.of(System.getProperty("java.io.tmpdir")),
+                Optional.of(true)
+        ));
+        devTools.addListener(org.openqa.selenium.devtools.v97.browser.Browser.downloadWillBegin(), downloadWillBegin -> {
+            System.out.println("Download Started!!");
+        });
+
+        devTools.addListener(org.openqa.selenium.devtools.v97.browser.Browser.downloadProgress(), downloadProgress -> {
+            if (downloadProgress.getReceivedBytes().longValue() >= (downloadProgress.getTotalBytes().longValue() / 2L)) {
+                devTools.send(org.openqa.selenium.devtools.v97.browser.Browser.cancelDownload(
+                        downloadProgress.getGuid(),
+                        Optional.empty()
+                ));
+                isCompleted = true;
+            }
+        });
+
+        driver.get("https://the-internet.herokuapp.com/download");
+        Thread.sleep(5000);
+        driver.findElement((By.cssSelector("[href=\"download/5mb script.xml\"]"))).click();
+
+        do {
+            Thread.sleep(100);
+        } while (!isCompleted);
+
+        isCompleted = false;
     }
 
     @Test
